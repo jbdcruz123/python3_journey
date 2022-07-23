@@ -1,0 +1,48 @@
+#!/usr/bin/python3
+
+import threading
+import time
+
+exitFlag = 0
+
+class myThread (threading.Thread):#1D
+	def __init__(self, threadID, name, counter):#1A
+		threading.Thread.__init__(self)
+		self.threadID = threadID
+		self.name = name
+		self.counter = counter
+	#1A
+
+	def run(self):#1B
+		print ("Starting " + self.name)
+		print_time(self.name, self.counter, 5)
+		print ("Exiting " + self.name)
+	#1B
+#1D
+
+def print_time(threadName, delay, counter):#1C
+	while counter:#2
+		print(f"L12 threadName {threadName}, exitFlag {exitFlag}, counter {counter}\n")
+		if exitFlag:#3
+			printf(f"L13 threadName {threadName},\n")
+			threadName.exit()
+		#3
+		time.sleep(delay)
+		print ("%s: %s" % (threadName, time.ctime(time.time())), f" exitFlag {exitFlag}")
+		counter -= 1
+	#2
+	print(f"L14 threadName {threadName}, exitFlag {exitFlag}, counter {counter}\n")
+
+#1C
+
+# Create new threads
+thread1 = myThread(1, "Thread-1", 1)
+thread2 = myThread(2, "Thread-2", 2)
+
+# Start new Threads
+thread1.start()
+thread2.start()
+thread1.join() #main_function will wait thread1 to finish
+thread2.join() #main_function will wait thread2 to finish
+
+print ("Exiting Main Thread")

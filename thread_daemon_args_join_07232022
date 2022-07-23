@@ -1,0 +1,77 @@
+
+#reference
+#https://docs.python.org/3/library/threading.html#threading.Condition
+
+import time
+import threading
+import sys
+
+#function thread
+
+
+def f_func_thre(leng_time):#1
+
+      oras = time
+
+      file_ = open("zzz.txt", "w")
+
+      print(f"L10 leng_time {leng_time} \n")      
+      i = 0
+      coun = 0
+      while i < leng_time :#2
+
+            oras.localtime()
+            move_seco = oras.localtime().tm_sec
+            wait_seco = move_seco
+
+            while move_seco == wait_seco:#3
+
+                  move_seco = oras.localtime().tm_sec
+
+            #3
+
+            disp = f"coun {coun}\n"
+            print(disp)
+            file_.write(disp)
+            file_.flush()
+            #lagyan write in text file ito
+
+
+            i+=1
+            coun+=1
+
+      #2
+
+      file_.close()
+
+#1
+
+limi_time = 10
+
+
+print("test daemon false\n")
+
+#daemon True can auto matically exit itself when main_function exits, 
+#must have function parameter kung may args =(0, ) 0 means first value of first parameter
+#remember it is a tuple
+
+#daemon false, default parameter, kung tapos na main_function, tutuloy parin ito
+
+thre = threading.Thread(target = lambda p : f_func_thre(limi_time) , args=(0, ), daemon = False )
+
+
+print(thre.daemon)
+
+thre.start()
+
+             
+#thre.join() #main_function (itong kasalukuyan function) will wait for thre to end
+             #kahit sa daemon gagana ito
+
+
+print(f"end of main_func\n\n")
+
+sys.exit()
+
+print(f"after exit()\n\n")
+

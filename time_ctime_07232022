@@ -1,0 +1,14 @@
+
+https://www.programiz.com/python-programming/time
+
+import time
+
+#time does not have constructor
+oras = time
+
+print(oras.time())
+
+print(oras.ctime(oras.time()))
+
+
+print(f" month {oras.localtime().tm_mon}, day {oras.localtime().tm_mday},  year {oras.localtime().tm_year},  hour {oras.localtime().tm_hour}, mins {oras.localtime().tm_min}, secs {oras.localtime().tm_sec}\n") 

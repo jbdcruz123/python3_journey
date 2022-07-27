@@ -1,0 +1,112 @@
+#07262022
+#shinare ng isang member sa group ng fb ng python philippines, maganda itong idea para sa gumagamit ng multi thread
+#naka design dito ung tamang process ng pag cloclose ng thread bago mag close ang program
+#binalutan ito ng class object at nag inherit sa QWidget
+
+from PyQt5.QtWidgets import *
+import threading, time, sys
+
+# Window size constants
+WIDTH = 640
+HEIGHT = 480
+
+thread_list = [] # Holds created thread objects
+thread_states = [] # Holds state for each thread
+thread_values = [] # Holds value for each thread
+
+class Window(QWidget):
+
+	"""
+		(6) Functions/Methods of Window widget in code
+		- __init__(self, parent=None)
+		- closeEvent(self, event)
+		- updateLabel(self)
+		- startThread(self)
+		- stopThreads(self)
+		- threadFunc(self, index_id)
+	"""
+
+	# Basic set up of UI
+	def __init__(self, parent=None):
+		QWidget.__init__(self, parent)
+		self.setWindowTitle("Multithreading Test")
+		self.setFixedSize(WIDTH, HEIGHT)
+		
+		layout = QVBoxLayout()
+		self.setLayout(layout)
+
+		self.thread_list_label = QLabel()
+		self.label_text = "Thread List: "
+
+		btn_run = QPushButton("Start Thread")
+		btn_run.clicked.connect(self.startThread)
+		btn_stop = QPushButton("Terminate and Free the Threads")
+		btn_stop.clicked.connect(self.stopThreads)
+
+		layout.addWidget(self.thread_list_label)
+		layout.addWidget(btn_run)
+		layout.addWidget(btn_stop)
+		layout.addStretch()
+
+		# This variable controls the flow of the updateLabel thread
+		self.update_control = True
+
+		# Just a thread that will constantly update the label widget
+		self.update_label_thread = threading.Thread(target=self.updateLabel, daemon=True)
+		self.update_label_thread.start()
+
+	# Override closeEvent method of the QWidget and change update_control to False
+	def closeEvent(self, event):
+		self.update_control = False
+		self.stopThreads() # You should terminate the threads before closing the widget
+		event.accept()
+	
+	# A thread function for update_label_thread
+	def updateLabel(self):
+		while self.update_control == True:
+			self.thread_list_label.setText(self.label_text + ", ".join([str(value) for value in thread_values]))
+			time.sleep(0.01)
+	
+	# Create and start a thread. Save it in the thread_list to be accessed when needed
+	# thread_states will control the flow of each thread
+	# thread_values are just values for each thread
+	def startThread(self):
+		index_id = len(thread_list)
+
+		created_thread = threading.Thread(target=self.threadFunc, args=(index_id,), daemon=True)
+
+		thread_list.append(created_thread)
+		thread_states.append(True)
+		thread_values.append(0)
+
+		created_thread.start()
+
+		print(f"Thread {index_id} created and started")
+
+	# Stop and free all the threads in the list
+	def stopThreads(self):
+		index = 0
+		while index < len(thread_list):
+			thread_states[index] = False
+			thread_list[index].join() # Join the selected thread to the main thread
+			print(f"Thread {index} joined the main thread")
+			index += 1
+		thread_list.clear()
+		thread_states.clear()
+		thread_values.clear()
+		print("All thread objects are deleted")
+	
+	# Function of the thread object, the index_id is an id for the thread object in all lists (thread_list, thread_states, thread_values)
+	def threadFunc(self, index_id):
+		while thread_states[index_id] == True:
+			thread_values[index_id] += 1 # Increment the thread value
+			time.sleep(0.1)
+
+# Entry point of the program
+if __name__=="__main__":
+	app = QApplication(sys.argv)
+	window = Window()
+	window.show()
+	app.exec()
+
+	input("Press enter to continue...")
